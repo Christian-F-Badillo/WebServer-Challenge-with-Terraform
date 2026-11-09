@@ -1,0 +1,11 @@
+# Env files
+.env 
+.txt
+.pem
+
+# Terraform
+.terraform*
+*.hcl
+*.tfstate
+*.tfstate.*
+*tfplan*
