@@ -1,0 +1,10 @@
+#!/bin/bash
+# Actualizar el sistema de paquetes
+yum update -y
+
+# Instalar el servidor web Apache
+yum install -y httpd
+
+# Habilitar y arrancar el servicio HTTPD
+systemctl enable httpd
+systemctl start httpd
