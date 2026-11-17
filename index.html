@@ -1,145 +1,270 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWS re/Start Lab - Terraform Success</title>
-    <style>
-        :root {
-            --primary: #FF9900;
-            --secondary: #232F3E;
-            --bg-color: #0F172A;
-            --card-bg: #1E293B;
-            --text-main: #F8FAFC;
-            --text-muted: #94A3B8;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <meta name="description" content="Página de demostración de un servidor web desplegado en Amazon EC2 con infraestructura aprovisionada mediante Terraform.">
+  <title>Web Server | AWS Infrastructure</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --surface: #121e30;
+      --surface-raised: #17263b;
+      --border: rgba(148, 163, 184, .17);
+      --text: #edf3fb;
+      --muted: #9aabc0;
+      --accent: #ffad33;
+      --accent-soft: rgba(255, 173, 51, .12);
+      --green: #55d6a0;
+      --radius: 22px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 32px 20px;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 15% 10%, rgba(255, 173, 51, .10), transparent 34rem),
+        radial-gradient(ellipse at 90% 85%, rgba(61, 126, 190, .13), transparent 32rem),
+        var(--bg);
+    }
 
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-        }
+    .page { width: min(100%, 920px); }
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: .78rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; }
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid rgba(255, 173, 51, .4);
+      border-radius: 11px;
+      color: var(--accent);
+      background: var(--accent-soft);
+      font-size: 1.05rem;
+    }
+    .topline-label { text-align: right; }
 
-        .container {
-            background-color: var(--card-bg);
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 2.5rem;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-            text-align: center;
-        }
+    main {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, rgba(23, 38, 59, .97), rgba(15, 27, 44, .98));
+      box-shadow: 0 28px 80px rgba(0, 0, 0, .34);
+    }
+    .hero { padding: clamp(28px, 6vw, 64px); }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 12px;
+      border: 1px solid rgba(85, 214, 160, .25);
+      border-radius: 999px;
+      color: #a9e9cf;
+      background: rgba(85, 214, 160, .08);
+      font-size: .78rem;
+      font-weight: 650;
+      letter-spacing: .04em;
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(85, 214, 160, .12);
+    }
+    h1 {
+      max-width: 700px;
+      margin: 25px 0 16px;
+      font-size: clamp(2.35rem, 6vw, 4.4rem);
+      line-height: 1.04;
+      letter-spacing: -.055em;
+    }
+    h1 span { color: var(--accent); }
+    .intro {
+      max-width: 650px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.12rem);
+      line-height: 1.8;
+    }
 
-        .badge {
-            display: inline-block;
-            background-color: rgba(255, 153, 0, 0.15);
-            color: var(--primary);
-            font-size: 0.85rem;
-            font-weight: 600;
-            padding: 0.35rem 0.85rem;
-            border-radius: 50px;
-            margin-bottom: 1.25rem;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
+    .section-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 34px 0 15px;
+    }
+    h2 { margin: 0; font-size: 1rem; letter-spacing: -.01em; }
+    .section-caption { color: var(--muted); font-size: .78rem; }
 
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 0.75rem;
-            font-weight: 700;
-        }
+    .specs {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .spec {
+      min-width: 0;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: rgba(7, 16, 29, .28);
+    }
+    .spec-label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: .75rem;
+    }
+    .spec-value {
+      display: block;
+      overflow-wrap: anywhere;
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .91rem;
+      font-weight: 650;
+    }
 
-        h1 span {
-            color: var(--primary);
-        }
+    .flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 9px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: rgba(7, 16, 29, .22);
+    }
+    .flow-step {
+      padding: 9px 12px;
+      border-radius: 9px;
+      color: #dce7f5;
+      background: var(--surface-raised);
+      font-size: .82rem;
+      font-weight: 600;
+    }
+    .flow-arrow { color: var(--accent); font-size: 1rem; }
 
-        p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-        }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 20px clamp(28px, 6vw, 64px);
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: .78rem;
+      line-height: 1.6;
+    }
+    .footer strong { color: #dce7f5; font-weight: 600; }
 
-        .specs {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            text-align: left;
-            margin-bottom: 2rem;
-            background-color: rgba(15, 23, 42, 0.6);
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid #334155;
-        }
-
-        .spec-item {
-            font-size: 0.85rem;
-        }
-
-        .spec-label {
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 0.2rem;
-        }
-
-        .spec-value {
-            color: var(--text-main);
-            font-weight: 600;
-            font-family: monospace;
-        }
-
-        .footer-note {
-            font-size: 0.8rem;
-            color: #64748B;
-            border-top: 1px solid #334155;
-            padding-top: 1.25rem;
-        }
-    </style>
+    @media (max-width: 700px) {
+      .specs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .topline { align-items: flex-start; }
+      .section-caption { text-align: right; }
+    }
+    @media (max-width: 440px) {
+      body { padding: 18px 12px; }
+      .topline-label { max-width: 120px; line-height: 1.5; }
+      .specs { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .spec { padding: 13px; }
+      .footer { flex-direction: column; gap: 6px; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      main { animation: enter .55s ease-out both; }
+      @keyframes enter {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="page">
+    <header class="topline">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">↗</span>
+        <span>Cloud Infrastructure</span>
+      </div>
+      <span class="topline-label">Infrastructure as Code · AWS</span>
+    </header>
 
-    <div class="container">
-        <div class="badge">Infraestructura como Código</div>
-        
-        <h1>Hola, soy <span>Christian Badillo</span></h1>
-        
-        <p>Infraestructura desplegada exitosamente en AWS mediante automatización con Terraform para el reto de servidores web.</p>
-        
-        <div class="specs">
-            <div class="spec-item">
-                <span class="spec-label">Entorno</span>
-                <span class="spec-value">AWS EC2 (t3.micro)</span>
-            </div>
-            <div class="spec-item">
-                <span class="spec-label">Sistema operativo</span>
-                <span class="spec-value">Amazon Linux 2023</span>
-            </div>
-            <div class="spec-item">
-                <span class="spec-label">Servidor Web</span>
-                <span class="spec-value">Apache (httpd)</span>
-            </div>
-            <div class="spec-item">
-                <span class="spec-label">Provisionamiento</span>
-                <span class="spec-value">Terraform + UserData</span>
-            </div>
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div class="eyebrow">
+          <span class="status-dot" aria-hidden="true"></span>
+          Web server demonstration
         </div>
 
-        <div class="footer-note">
-            AWS re/Start Challenge Lab &bull; Desplegado con éxito 🚀
-        </div>
-    </div>
+        <h1 id="page-title">A web server, <span>provisioned with code.</span></h1>
+        <p class="intro">
+          This page is served by an Apache web server running on Amazon EC2.
+          The underlying network and compute infrastructure are provisioned
+          declaratively with Terraform.
+        </p>
 
+        <div class="section-heading">
+          <h2>Deployment overview</h2>
+          <span class="section-caption">Reference configuration</span>
+        </div>
+
+        <div class="specs" aria-label="Deployment specifications">
+          <div class="spec">
+            <span class="spec-label">Compute</span>
+            <span class="spec-value">Amazon EC2</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Instance type</span>
+            <span class="spec-value">t3.micro</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Operating system</span>
+            <span class="spec-value">Amazon Linux 2023</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Web server</span>
+            <span class="spec-value">Apache · httpd</span>
+          </div>
+        </div>
+
+        <div class="section-heading">
+          <h2>Provisioning flow</h2>
+          <span class="section-caption">High-level workflow</span>
+        </div>
+        <div class="flow" aria-label="Terraform provisions AWS infrastructure, EC2 runs Apache, and Apache serves this page">
+          <span class="flow-step">Terraform</span>
+          <span class="flow-arrow" aria-hidden="true">→</span>
+          <span class="flow-step">AWS VPC &amp; EC2</span>
+          <span class="flow-arrow" aria-hidden="true">→</span>
+          <span class="flow-step">Apache</span>
+          <span class="flow-arrow" aria-hidden="true">→</span>
+          <span class="flow-step">Web page</span>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span><strong>AWS Web Server Lab</strong> · Infrastructure as Code</span>
+        <span>Provisioned with Terraform</span>
+      </footer>
+    </main>
+  </div>
 </body>
 </html>
